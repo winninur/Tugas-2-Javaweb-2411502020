@@ -1,3 +1,4 @@
+
 package com.budiluhur.catalog_product_delete.repository;
 
 import java.util.ArrayList;
@@ -15,23 +16,48 @@ public class ProductRepository {
     private final List<Product> productList = new ArrayList<>();
 
     public ProductRepository() {
-        productList.add(new Product("PRD-01", "Keyboard Mechanical", 450000.0));
-        productList.add(new Product("PRD-02", "Mouse Wireless Silent", 175000.0));
+        productList.add(new Product(
+                "PRD-01", "Keyboard Mechanical", 450000.0));
+        productList.add(new Product(
+                "PRD-02", "Mouse Wireless Silent", 175000.0));
     }
 
-    public void addProduct(Product product) {productList.add(product);}
-    public List<Product> findAll() {return productList;}
+    // Menambahkan produk baru dan mencegah ID duplikat
+    public void addProduct(Product product) {
+        for (Product p : productList) {
+            if (p.getId().equalsIgnoreCase(product.getId())) {
+                throw new IllegalArgumentException(
+                        "Produk dengan ID '" + product.getId()
+                                + "' sudah ada!");
+            }
+        }
 
-    public Product findById(String id) throws ProductNotFoundException {for (Product p : productList) {if (p.getId().equalsIgnoreCase(id)) {
+        productList.add(product);
+    }
+
+    // Mengambil semua produk
+    public List<Product> findAll() {
+        return productList;
+    }
+
+    // Mencari produk berdasarkan ID
+    public Product findById(String id)
+            throws ProductNotFoundException {
+
+        for (Product p : productList) {
+            if (p.getId().equalsIgnoreCase(id)) {
                 return p;
             }
         }
 
-        throw new ProductNotFoundException( "Produk dengan ID '" + id + "' tidak ditemukan!");
+        throw new ProductNotFoundException(
+                "Produk dengan ID '" + id + "' tidak ditemukan!");
     }
 
-    public Product updateProduct(String id,
-            Product updatedProduct) throws ProductNotFoundException {
+    // Memperbarui produk yang sudah ada
+    public Product updateProduct(
+            String id, Product updatedProduct)
+            throws ProductNotFoundException {
 
         Product existingProduct = findById(id);
 
@@ -41,6 +67,7 @@ public class ProductRepository {
         return existingProduct;
     }
 
+    // Menghapus produk berdasarkan ID
     public boolean deleteById(String id)
             throws ProductNotFoundException {
 
@@ -48,11 +75,12 @@ public class ProductRepository {
 
         return productList.remove(existingProduct);
     }
+
     public List<Product> searchByName(String keyword) {
-    return productList.stream()
-            .filter(product -> product.getName()
-                    .toLowerCase()
-                    .contains(keyword.toLowerCase()))
-            .collect(Collectors.toList());
+        return productList.stream()
+                .filter(product -> product.getName()
+                        .toLowerCase()
+                        .contains(keyword.toLowerCase()))
+                .collect(Collectors.toList());
     }
 }
